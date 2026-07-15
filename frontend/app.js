@@ -1,8 +1,8 @@
-const api = "http://localhost:5000/api";
+const api = window.location.port === "8080" ? "/api" : "http://localhost:5000/api";
 const state = {
   user: JSON.parse(localStorage.getItem("papertrailUser") || "null"),
   books: [],
-  cart: [],
+  cart: []
 };
 
 const loginPage = document.querySelector("#loginPage");
@@ -15,25 +15,46 @@ const sortSelect = document.querySelector("#sortSelect");
 const cartItems = document.querySelector("#cartItems");
 const cartCount = document.querySelector("#cartCount");
 const profileCard = document.querySelector("#profileCard");
+const checkoutPanel = document.querySelector("#checkoutPanel");
+const pages = [...document.querySelectorAll(".app-shell .page")];
 
 function money(value) {
   return `$${Number(value || 0).toFixed(2)}`;
+}
+
+function ratingFor(book) {
+  return (4.1 + (book.id.length % 8) / 10).toFixed(1);
 }
 
 function showApp() {
   loginPage.classList.toggle("hidden", Boolean(state.user));
   appShell.classList.toggle("hidden", !state.user);
   document.body.classList.toggle("logged-in", Boolean(state.user));
+  if (state.user) routePage();
+}
+
+function routePage() {
+  const requested = (location.hash || "#home").replace("#", "");
+  const pageId = pages.some((page) => page.id === requested) ? requested : "home";
+  pages.forEach((page) => page.classList.toggle("active-page", page.id === pageId));
+  document.querySelectorAll("nav a, .cart-link").forEach((link) => {
+    link.classList.toggle("active-nav", link.getAttribute("href") === `#${pageId}`);
+  });
 }
 
 function renderProfile() {
   if (!state.user) return;
   profileCard.innerHTML = `
-    <div class="avatar">${state.user.name.slice(0, 1).toUpperCase()}</div>
-    <h3>${state.user.name}</h3>
-    <p><strong>Contact</strong>${state.user.contact}</p>
-    <p><strong>Email</strong>${state.user.email}</p>
-    <p><strong>Delivery address</strong>${state.user.deliveryAddress}</p>
+    <div class="profile-top">
+      <div class="avatar">${state.user.name.slice(0, 1).toUpperCase()}</div>
+      <div>
+        <span class="profile-status">Member profile</span>
+        <h3>${state.user.name}</h3>
+      </div>
+    </div>
+    <p><strong>Contact</strong><span>${state.user.contact}</span></p>
+    <p><strong>Email</strong><span>${state.user.email}</span></p>
+    <p><strong>Delivery address</strong><span>${state.user.deliveryAddress}</span></p>
     <button id="logoutButton" class="button ghost">Switch profile</button>
   `;
   document.querySelector("#logoutButton").addEventListener("click", () => {
@@ -45,35 +66,33 @@ function renderProfile() {
 function renderBooks() {
   let books = [...state.books];
   if (sortSelect.value === "price-low") books.sort((a, b) => a.price - b.price);
-  if (sortSelect.value === "price-high")
-    books.sort((a, b) => b.price - a.price);
-  if (sortSelect.value === "title")
-    books.sort((a, b) => a.title.localeCompare(b.title));
+  if (sortSelect.value === "price-high") books.sort((a, b) => b.price - a.price);
+  if (sortSelect.value === "title") books.sort((a, b) => a.title.localeCompare(b.title));
 
-  booksGrid.innerHTML = books
-    .map(
-      (book) => `
+  booksGrid.innerHTML = books.map((book) => `
     <article class="book-card">
       <div class="cover">
         ${book.thumbnail ? `<img src="${book.thumbnail}" alt="${book.title} cover" />` : `<span>${book.title.slice(0, 1)}</span>`}
         <div class="book-preview">
           <strong>${book.title}</strong>
-          <p>${book.description.slice(0, 170)}...</p>
+          <span>${(book.categories || ["General"])[0]} · ${money(book.price)} · ${ratingFor(book)} rating</span>
+          <p>${book.description.slice(0, 130)}...</p>
         </div>
       </div>
       <div class="book-info">
-        <p class="genre">${(book.categories || ["General"])[0]}</p>
+        <div class="book-meta">
+          <p class="genre">${(book.categories || ["General"])[0]}</p>
+          <span>${ratingFor(book)}</span>
+        </div>
         <h3>${book.title}</h3>
         <p>${(book.authors || ["Unknown author"]).join(", ")}</p>
         <div class="book-actions">
           <span>${money(book.price)}</span>
-          <button data-book="${book.id}">Add</button>
+          <button data-book="${book.id}">Add to cart</button>
         </div>
       </div>
     </article>
-  `,
-    )
-    .join("");
+  `).join("");
 
   document.querySelectorAll("[data-book]").forEach((button) => {
     button.addEventListener("click", () => addToCart(button.dataset.book));
@@ -81,22 +100,15 @@ function renderBooks() {
 }
 
 function renderCart() {
-  cartCount.textContent = state.cart.reduce(
-    (total, item) => total + Number(item.quantity || 1),
-    0,
-  );
+  cartCount.textContent = state.cart.reduce((total, item) => total + Number(item.quantity || 1), 0);
   if (!state.cart.length) {
     cartItems.innerHTML = `<div class="empty">Your cart is waiting for its first story.</div>`;
+    checkoutPanel.classList.add("hidden");
     return;
   }
-  const total = state.cart.reduce(
-    (sum, item) => sum + Number(item.price) * Number(item.quantity),
-    0,
-  );
+  const total = state.cart.reduce((sum, item) => sum + Number(item.price) * Number(item.quantity), 0);
   cartItems.innerHTML = `
-    ${state.cart
-      .map(
-        (item) => `
+    ${state.cart.map((item) => `
       <article class="cart-item">
         ${item.thumbnail ? `<img src="${item.thumbnail}" alt="" />` : `<div class="cart-cover"></div>`}
         <div>
@@ -104,36 +116,59 @@ function renderCart() {
           <p>${item.authors || "Unknown author"}</p>
           <span>${money(item.price)} x ${item.quantity}</span>
         </div>
+        <strong>${money(Number(item.price) * Number(item.quantity))}</strong>
         <button data-remove="${item.book_id}">Remove</button>
       </article>
-    `,
-      )
-      .join("")}
-    <div class="cart-total"><span>Total</span><strong>${money(total)}</strong></div>
+    `).join("")}
+  `;
+  checkoutPanel.classList.remove("hidden");
+  checkoutPanel.innerHTML = `
+    <div>
+      <p class="eyebrow">Checkout</p>
+      <h3>Order summary</h3>
+      <p>${state.cart.length} selected title${state.cart.length === 1 ? "" : "s"}</p>
+      <div class="summary-line"><span>Subtotal</span><strong>${money(total)}</strong></div>
+      <div class="summary-line"><span>Delivery</span><strong>${total >= 35 ? "Free" : "$4.99"}</strong></div>
+      <div class="summary-line total"><span>Total</span><strong>${money(total + (total >= 35 ? 0 : 4.99))}</strong></div>
+      <div class="delivery-box">
+        <span>Deliver to</span>
+        <strong>${state.user.name}</strong>
+        <p>${state.user.deliveryAddress}</p>
+      </div>
+    </div>
+    <button id="checkoutButton">Confirm checkout</button>
   `;
   document.querySelectorAll("[data-remove]").forEach((button) => {
-    button.addEventListener("click", () =>
-      removeFromCart(button.dataset.remove),
-    );
+    button.addEventListener("click", () => removeFromCart(button.dataset.remove));
+  });
+  document.querySelector("#checkoutButton").addEventListener("click", () => {
+    checkoutPanel.innerHTML = `
+      <div>
+        <p class="eyebrow">Order received</p>
+        <h3>Your Papertrail order is ready for confirmation.</h3>
+        <p>We will contact ${state.user.contact} before delivery.</p>
+      </div>
+      <a class="button ghost" href="#catalog">Keep browsing</a>
+    `;
   });
 }
 
 async function loadBooks() {
   booksGrid.innerHTML = `<div class="empty">Loading books from the shelf...</div>`;
-  const params = new URLSearchParams({
-    q: searchInput.value || "modern books",
-    genre: genreSelect.value,
-  });
-  const response = await fetch(`${api}/books?${params}`);
-  state.books = await response.json();
-  renderBooks();
+  const params = new URLSearchParams({ q: searchInput.value || "popular books", genre: genreSelect.value });
+  try {
+    const response = await fetch(`${api}/books?${params}`);
+    if (!response.ok) throw new Error("Unable to load catalog");
+    state.books = await response.json();
+    renderBooks();
+  } catch {
+    booksGrid.innerHTML = `<div class="empty">The catalog is taking a breather. Start the API or try again in a moment.</div>`;
+  }
 }
 
 async function loadCart() {
   if (!state.user) return;
-  const response = await fetch(
-    `${api}/cart/${encodeURIComponent(state.user.email)}`,
-  );
+  const response = await fetch(`${api}/cart/${encodeURIComponent(state.user.email)}`);
   state.cart = await response.json();
   renderCart();
 }
@@ -143,16 +178,13 @@ async function addToCart(bookId) {
   await fetch(`${api}/cart`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: state.user.email, book }),
+    body: JSON.stringify({ email: state.user.email, book })
   });
   await loadCart();
 }
 
 async function removeFromCart(bookId) {
-  await fetch(
-    `${api}/cart/${encodeURIComponent(state.user.email)}/${encodeURIComponent(bookId)}`,
-    { method: "DELETE" },
-  );
+  await fetch(`${api}/cart/${encodeURIComponent(state.user.email)}/${encodeURIComponent(bookId)}`, { method: "DELETE" });
   await loadCart();
 }
 
@@ -162,7 +194,7 @@ loginForm.addEventListener("submit", async (event) => {
   const response = await fetch(`${api}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    body: JSON.stringify(body)
   });
   state.user = await response.json();
   localStorage.setItem("papertrailUser", JSON.stringify(state.user));
@@ -180,6 +212,17 @@ document.querySelectorAll("[data-genre]").forEach((button) => {
     location.hash = "catalog";
     await loadBooks();
   });
+});
+window.addEventListener("hashchange", routePage);
+
+// A small, dependency-free depth effect for the glass gallery.
+document.addEventListener("pointermove", (event) => {
+  const gallery = document.querySelector(".hero-gallery");
+  if (!gallery || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const x = (event.clientX / window.innerWidth - 0.5) * 7;
+  const y = (event.clientY / window.innerHeight - 0.5) * -7;
+  gallery.style.setProperty("--tilt-x", `${x}deg`);
+  gallery.style.setProperty("--tilt-y", `${y}deg`);
 });
 
 showApp();

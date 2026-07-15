@@ -7,26 +7,40 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <div class="aurora" aria-hidden="true">
+      <span class="orb orb-one"></span><span class="orb orb-two"></span><span class="orb orb-three"></span>
+    </div>
+    <div class="promo-bar"><span class="pulse-dot"></span> Free delivery over $35 · Curated weekly picks · Secure checkout</div>
     <header class="site-header">
       <a class="brand" href="#home" aria-label="Papertrail home">
         <img src="assets/logo.svg" alt="" />
-        <span>Papertrail</span>
+        <span>Papertrail <small>Bookshop</small></span>
       </a>
       <nav>
         <a href="#home">Home</a>
         <a href="#catalog">Catalog</a>
         <a href="#categories">Categories</a>
         <a href="#profile">Profile</a>
-        <a href="#cart">Cart <span id="cartCount">0</span></a>
       </nav>
+      <a class="cart-link" href="#cart">Cart <span id="cartCount">0</span></a>
     </header>
 
     <main>
       <section id="loginPage" class="login-page">
+        <div class="login-art">
+          <img src="https://covers.openlibrary.org/b/isbn/9780593321201-L.jpg" alt="" />
+          <img src="https://covers.openlibrary.org/b/isbn/9780441172719-L.jpg" alt="" />
+          <img src="https://covers.openlibrary.org/b/isbn/9780062316097-L.jpg" alt="" />
+        </div>
         <div class="login-panel">
           <img src="assets/logo.svg" alt="" class="login-logo" />
           <h1>Welcome to Papertrail</h1>
-          <p>Sign in once to save your profile, delivery address, and cart.</p>
+          <p>Build your reading profile, save delivery details, and keep your cart ready across visits.</p>
+          <div class="login-benefits">
+            <span>Curated catalog</span>
+            <span>Fast delivery</span>
+            <span>Personal cart</span>
+          </div>
           <form id="loginForm">
             <label>Name <input name="name" required placeholder="Alex Reader" /></label>
             <label>Contact <input name="contact" required placeholder="+1 555 012 7788" /></label>
@@ -38,21 +52,70 @@
       </section>
 
       <div id="appShell" class="app-shell hidden">
-        <section id="home" class="hero page">
-          <div class="hero-copy">
-            <p class="eyebrow">Independent online bookshop</p>
-            <h1>Papertrail</h1>
-            <p>Discover beautiful reads across fiction, knowledge, craft, and wonder. Search live book APIs, preview details on hover, and keep your next delivery ready.</p>
-            <div class="hero-actions">
-              <a class="button" href="#catalog">Browse books</a>
-              <a class="button ghost" href="#profile">View profile</a>
+        <section id="home" class="home-page page active-page">
+          <div class="hero-stage">
+            <div class="hero-copy">
+              <p class="eyebrow">Famous independent online bookshop</p>
+              <h1>Papertrail</h1>
+              <p>A polished bookstore for thoughtful readers. Browse live book data, explore hand-sorted genres, preview each title instantly, and checkout with a saved delivery profile.</p>
+              <div class="hero-actions">
+                <a class="button" href="#catalog">Shop the catalog</a>
+                <a class="button ghost" href="#categories">Browse genres</a>
+              </div>
+              <div class="hero-stats">
+                <span><strong>40+</strong> live results</span>
+                <span><strong>24</strong> house picks</span>
+                <span><strong>9</strong> sorted genres</span>
+              </div>
+            </div>
+            <div class="hero-gallery" aria-label="Featured books">
+              <img class="feature-cover tall" src="https://covers.openlibrary.org/b/isbn/9780525559474-L.jpg" alt="The Midnight Library cover" />
+              <img class="feature-cover" src="https://covers.openlibrary.org/b/isbn/9780062060624-L.jpg" alt="The Song of Achilles cover" />
+              <img class="feature-cover raised" src="https://covers.openlibrary.org/b/isbn/9780593135204-L.jpg" alt="Project Hail Mary cover" />
+              <div class="curator-note">
+                <span>Editor pick</span>
+                <strong>Stories with texture, pace, and a little staying power.</strong>
+              </div>
             </div>
           </div>
-          <div class="shelf-preview">
-            <div class="book-spine coral"></div>
-            <div class="book-spine mint"></div>
-            <div class="book-spine ink"></div>
-            <div class="book-spine gold"></div>
+
+          <div class="home-strip" aria-label="Papertrail services">
+            <article>
+              <span>01</span>
+              <h3>Curated shelves</h3>
+              <p>Editorial picks sit beside live API results, so the store feels broad but still personal.</p>
+            </article>
+            <article>
+              <span>02</span>
+              <h3>Quick discovery</h3>
+              <p>Genres, search, sorting, and hover previews help shoppers decide faster.</p>
+            </article>
+            <article>
+              <span>03</span>
+              <h3>Ready checkout</h3>
+              <p>Saved contact and delivery details keep the buying flow clean and low-friction.</p>
+            </article>
+          </div>
+
+          <div class="home-feature">
+            <div>
+              <p class="eyebrow">Built for browsing</p>
+              <h2>Find a book without fighting the interface.</h2>
+              <p>Papertrail keeps the experience calm, visual, and direct: cover-first browsing, useful filters, and a cart that feels like a proper checkout summary.</p>
+              <a class="button" href="#catalog">Start browsing</a>
+            </div>
+            <div class="mini-shelf">
+              <img src="https://covers.openlibrary.org/b/isbn/9780547928227-L.jpg" alt="The Hobbit cover" />
+              <img src="https://covers.openlibrary.org/b/isbn/9780316556347-L.jpg" alt="Circe cover" />
+              <img src="https://covers.openlibrary.org/b/isbn/9781250301697-L.jpg" alt="The Silent Patient cover" />
+              <img src="https://covers.openlibrary.org/b/isbn/9781524763138-L.jpg" alt="Becoming cover" />
+            </div>
+          </div>
+
+          <div class="home-cta">
+            <p class="eyebrow">Next stop</p>
+            <h2>Explore the shelves by genre.</h2>
+            <a class="button ghost" href="#categories">View categories</a>
           </div>
         </section>
 
@@ -60,19 +123,20 @@
           <div class="section-title">
             <p class="eyebrow">Live catalog</p>
             <h2>Find your next book</h2>
+            <p>Search the wider shelf, then refine by genre, price, or title.</p>
           </div>
           <div class="filters">
             <input id="searchInput" placeholder="Search by title, author, or keyword" />
             <select id="genreSelect">
               <option value="">All genres</option>
-              <option>Fiction</option>
+              <option>Biography</option>
+              <option>Business</option>
               <option>Fantasy</option>
+              <option>Fiction</option>
+              <option>History</option>
               <option>Mystery</option>
               <option>Romance</option>
               <option>Science Fiction</option>
-              <option>Biography</option>
-              <option>Business</option>
-              <option>History</option>
               <option>Self-Help</option>
             </select>
             <select id="sortSelect">
@@ -90,16 +154,18 @@
           <div class="section-title">
             <p class="eyebrow">Categories and genres</p>
             <h2>Shop by mood</h2>
+            <p>Each genre opens the catalog with matching results.</p>
           </div>
           <div class="category-grid">
-            <button data-genre="Fiction">Fiction</button>
-            <button data-genre="Fantasy">Fantasy</button>
-            <button data-genre="Mystery">Mystery</button>
-            <button data-genre="Romance">Romance</button>
-            <button data-genre="Science Fiction">Science Fiction</button>
-            <button data-genre="Biography">Biography</button>
-            <button data-genre="History">History</button>
-            <button data-genre="Business">Business</button>
+            <button data-genre="Biography"><strong>Biography</strong><span>Lives worth lingering over</span></button>
+            <button data-genre="Business"><strong>Business</strong><span>Ideas, teams, and focus</span></button>
+            <button data-genre="Fantasy"><strong>Fantasy</strong><span>Myth, wonder, and worlds</span></button>
+            <button data-genre="Fiction"><strong>Fiction</strong><span>Modern literary shelves</span></button>
+            <button data-genre="History"><strong>History</strong><span>Context for curious minds</span></button>
+            <button data-genre="Mystery"><strong>Mystery</strong><span>Sharp turns and reveals</span></button>
+            <button data-genre="Romance"><strong>Romance</strong><span>Warm, clever, intimate</span></button>
+            <button data-genre="Science Fiction"><strong>Science Fiction</strong><span>Future-facing stories</span></button>
+            <button data-genre="Self-Help"><strong>Self-Help</strong><span>Better habits and clarity</span></button>
           </div>
         </section>
 
@@ -116,8 +182,12 @@
           <div class="section-title">
             <p class="eyebrow">Cart</p>
             <h2>Reserved for delivery</h2>
+            <p>Review your selected books and confirm delivery details.</p>
           </div>
-          <div id="cartItems" class="cart-list"></div>
+          <div class="cart-layout">
+            <div id="cartItems" class="cart-list"></div>
+            <div id="checkoutPanel" class="checkout-panel hidden"></div>
+          </div>
         </section>
       </div>
     </main>

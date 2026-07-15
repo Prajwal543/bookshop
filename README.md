@@ -61,15 +61,16 @@ these settings:
 
 Add a GitHub webhook for `https://YOUR_JENKINS_URL/github-webhook/` and enable
 the GitHub hook trigger in the job. The Jenkins agent needs Docker, Docker
-Compose v2, Node.js, and permission to run Docker. This pipeline deploys to the
-machine that runs the Jenkins agent; deploying to a separate server requires an
-SSH credential and that server's address.
+Compose v2, Node.js, Trivy, and permission to run Docker. The Trivy stage blocks
+deployment on high/critical vulnerabilities, secrets, or misconfigurations. This
+pipeline deploys to the machine that runs the Jenkins agent; deploying to a
+separate server requires an SSH credential and that server's address.
 
 ## CI requirements
 
-The Jenkins agent needs Docker, Docker Compose v2, and Node.js available. The
-included pipeline runs `npm ci`, builds the services, and validates the Compose
-configuration.
+The Jenkins agent needs Docker, Docker Compose v2, Node.js, and Trivy available.
+The included pipeline runs `npm ci`, scans the repository with Trivy, builds the
+services, validates the Compose configuration, and deploys the stack.
 
 ## Stop
 

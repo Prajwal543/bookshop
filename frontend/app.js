@@ -45,17 +45,25 @@ function routePage() {
 function renderProfile() {
   if (!state.user) return;
   profileCard.innerHTML = `
-    <div class="profile-top">
-      <div class="avatar">${state.user.name.slice(0, 1).toUpperCase()}</div>
-      <div>
-        <span class="profile-status">Member profile</span>
-        <h3>${state.user.name}</h3>
+    <div class="profile-card-header">
+      <div class="profile-top">
+        <div class="avatar">${state.user.name.slice(0, 1).toUpperCase()}</div>
+        <div>
+          <span class="profile-status">Papertrail member</span>
+          <h3>${state.user.name}</h3>
+        </div>
       </div>
+      <span class="profile-ready">Ready to order</span>
     </div>
-    <p><strong>Contact</strong><span>${state.user.contact}</span></p>
-    <p><strong>Email</strong><span>${state.user.email}</span></p>
-    <p><strong>Delivery address</strong><span>${state.user.deliveryAddress}</span></p>
-    <button id="logoutButton" class="button ghost">Switch profile</button>
+    <div class="profile-details">
+      <div class="profile-detail"><span>Contact</span><strong>${state.user.contact}</strong></div>
+      <div class="profile-detail"><span>Email</span><strong>${state.user.email}</strong></div>
+      <div class="profile-detail address"><span>Delivery address</span><strong>${state.user.deliveryAddress}</strong></div>
+    </div>
+    <div class="profile-card-footer">
+      <span><b>✦</b> Delivery profile saved</span>
+      <button id="logoutButton" class="button ghost">Switch profile</button>
+    </div>
   `;
   document.querySelector("#logoutButton").addEventListener("click", () => {
     localStorage.removeItem("papertrailUser");

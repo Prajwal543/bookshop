@@ -44,6 +44,27 @@ docker-compose.yml  Local full-stack environment
 Jenkinsfile     CI pipeline
 ```
 
+## GitHub-to-Jenkins deployment
+
+The `Jenkinsfile` checks out the branch that triggered the job, validates the
+application, then runs `docker compose up -d --build --remove-orphans` on the
+Jenkins agent. Unlike the previous pipeline, it does not stop the deployed
+containers after a successful build.
+
+In Jenkins, create either a **Multibranch Pipeline** or a **Pipeline** job with
+these settings:
+
+- SCM: Git
+- Repository URL: `https://github.com/Prajwal543/bookshop.git`
+- Script path: `Jenkinsfile`
+- Branch: the branch you want to deploy (normally `main`)
+
+Add a GitHub webhook for `https://YOUR_JENKINS_URL/github-webhook/` and enable
+the GitHub hook trigger in the job. The Jenkins agent needs Docker, Docker
+Compose v2, Node.js, and permission to run Docker. This pipeline deploys to the
+machine that runs the Jenkins agent; deploying to a separate server requires an
+SSH credential and that server's address.
+
 ## CI requirements
 
 The Jenkins agent needs Docker, Docker Compose v2, and Node.js available. The

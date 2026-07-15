@@ -406,14 +406,14 @@ textarea {
 }
 
 .hero-stage {
-  width: min(1200px, calc(100% - 40px));
+  width: min(1320px, calc(100% - 40px));
   margin: 0 auto;
-  min-height: calc(100vh - 104px);
+  min-height: 680px;
   display: grid;
-  grid-template-columns: minmax(0, 0.98fr) minmax(360px, 0.82fr);
+  grid-template-columns: minmax(0, 1fr) minmax(420px, 0.9fr);
   align-items: center;
-  gap: 58px;
-  padding: 42px 0 48px;
+  gap: clamp(40px, 5vw, 80px);
+  padding: clamp(38px, 5vw, 72px);
 }
 
 .hero-copy p:not(.eyebrow) {
@@ -905,8 +905,7 @@ textarea {
   font-weight: 900;
 }
 
-.ls
--status {
+.profile-status {
   color: var(--coral);
   font-size: 0.72rem;
   font-weight: 900;
@@ -1084,6 +1083,7 @@ footer strong {
   .hero-stage {
     min-height: auto;
     text-align: center;
+    padding: 48px clamp(26px, 8vw, 64px);
   }
 
   .hero-copy p:not(.eyebrow) {
@@ -1139,6 +1139,10 @@ footer strong {
     width: min(100% - 26px, 1200px);
   }
 
+  .hero-stage {
+    padding: 34px 16px;
+  }
+
   .login-panel {
     padding: 24px;
   }
@@ -1156,7 +1160,7 @@ footer strong {
   }
 
   .hero-gallery {
-    min-height: 374px;
+    min-height: 430px;
   }
 
   .home-feature {
@@ -1167,7 +1171,25 @@ footer strong {
     min-width: 128px;
   }
 
+  .feature-cover.tall {
+    left: 0;
+    top: 48px;
+  }
+
+  .feature-cover:not(.tall):not(.raised) {
+    right: 0;
+    top: 108px;
+  }
+
+  .feature-cover.raised {
+    left: 50%;
+    bottom: 112px;
+    transform: translateX(-50%) rotate(1deg);
+  }
+
   .curator-note {
+    right: 13px;
+    bottom: 22px;
     width: calc(100% - 26px);
   }
 

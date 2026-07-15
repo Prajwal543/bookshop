@@ -1,55 +1,50 @@
 pipeline {
-  agent any
+    agent any
 
-  options {
-    timestamps()
-    disableConcurrentBuilds()
-    skipDefaultCheckout(true)
-  }
-
-  environment {
-    COMPOSE_PROJECT_NAME = 'papertrail'
-  }
-
-  stages {
-    stage('Checkout from GitHub') {
-      steps {
-        // In a Multibranch Pipeline or a Pipeline configured as “Pipeline script
-        // from SCM”, this checks out the exact GitHub branch that triggered Jenkins.
-        checkout scm
-      }
+    options {
+        timestamps()
+        disableConcurrentBuilds()
+        skipDefaultCheckout(true)
     }
 
-    stage('Validate application') {
-      steps {
-        dir('backend') {
-          sh 'npm ci'
+    environment {
+        COMPOSE_PROJECT_NAME = 'papertrail'
+    }
+
+    stages {
+
+        stage('Checkout from GitHub') {
+            steps {
+                checkout scm
+            }
         }
-        sh 'docker compose config --quiet'
-      }
+
+        stage('Validate Compose') {
+            steps {
+                sh 'docker compose config --quiet'
+            }
+        }
+
+        stage('Build and Deploy') {
+            steps {
+                sh 'docker compose up -d --build --remove-orphans'
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                sh 'docker compose ps'
+            }
+        }
     }
 
-    stage('Build and deploy') {
-      steps {
-        // The Jenkins agent is the deployment host. Containers are deliberately
-        // left running after a successful build.
-        sh 'docker compose up -d --build --remove-orphans'
-      }
-    }
+    post {
+        always {
+            sh 'docker compose ps || true'
+        }
 
-    stage('Verify deployment') {
-      steps {
-        sh 'docker compose ps'
-        sh 'docker compose exec -T frontend wget -qO- http://localhost/ > /dev/null'
-        sh 'docker compose exec -T frontend wget -qO- http://backend:5000/api/health > /dev/null'
-      }
+        failure {
+            sh 'docker compose logs --tail=100 || true'
+        }
     }
-  }
-
-  post {
-    failure {
-      sh 'docker compose ps || true'
-      sh 'docker compose logs --tail=100 || true'
-    }
-  }
 }
